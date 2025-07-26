@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Minus, Zap, Trophy } from "lucide-react";
 import { games } from "@/data/gameData";
+import { SlotMachine } from "@/components/SlotMachine";
 
 const SlotsGame = () => {
   const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
-  const [betAmount, setBetAmount] = useState(25);
+  const [betAmount, setBetAmount] = useState(1250);
   const [isSpinning, setIsSpinning] = useState(false);
   const [reels, setReels] = useState(['🍒', '🍒', '🍒']);
   const [gameResult, setGameResult] = useState<string>("");
@@ -132,7 +133,7 @@ const SlotsGame = () => {
       
       toast({
         title: "🎉 You Won!",
-        description: `${resultText} You won $${totalWin}!`,
+        description: `${resultText} You won KES ${totalWin.toLocaleString()}!`,
       });
     } else {
       setGameResult("No winning combination. Try again!");
@@ -172,19 +173,19 @@ const SlotsGame = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Your Balance</p>
-            <p className="text-2xl font-bold text-primary">${balance}</p>
+            <p className="text-2xl font-bold text-primary">KES {balance.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Min Bet</p>
-            <p className="text-2xl font-bold text-foreground">${game.minBet}</p>
+            <p className="text-2xl font-bold text-foreground">KES {game.minBet.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Max Bet</p>
-            <p className="text-2xl font-bold text-foreground">${game.maxBet}</p>
+            <p className="text-2xl font-bold text-foreground">KES {game.maxBet.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Current Bet</p>
-            <p className="text-2xl font-bold text-accent">${betAmount}</p>
+            <p className="text-2xl font-bold text-accent">KES {betAmount.toLocaleString()}</p>
           </div>
         </div>
 
@@ -196,7 +197,7 @@ const SlotsGame = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 25))}
+              onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 625))}
               disabled={betAmount <= game.minBet || isSpinning}
             >
               <Minus className="h-4 w-4" />
@@ -215,7 +216,7 @@ const SlotsGame = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 25))}
+              onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 625))}
               disabled={betAmount >= game.maxBet || isSpinning}
             >
               <Plus className="h-4 w-4" />
@@ -223,7 +224,7 @@ const SlotsGame = () => {
           </div>
           
           <div className="flex gap-2 mb-4">
-            {[5, 25, 50, 100].map((amount) => (
+            {[625, 1250, 2500, 5000].map((amount) => (
               <Button
                 key={amount}
                 variant="outline"
@@ -231,65 +232,22 @@ const SlotsGame = () => {
                 onClick={() => setBetAmount(Math.min(game.maxBet, amount))}
                 disabled={isSpinning}
               >
-                ${amount}
+                KES {amount.toLocaleString()}
               </Button>
             ))}
           </div>
         </div>
 
         {/* Slot Machine */}
-        <div className="bg-gradient-card border border-border/50 rounded-lg p-8 mb-6">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-4">🎰 Golden Slots 🎰</h2>
-            
-            {/* Reels */}
-            <div className="flex justify-center gap-4 mb-6">
-              {reels.map((symbol, index) => (
-                <div
-                  key={index}
-                  className={`w-24 h-24 bg-card border-4 border-primary/50 rounded-lg flex items-center justify-center text-4xl ${
-                    isSpinning ? 'animate-spin' : ''
-                  }`}
-                >
-                  {symbol}
-                </div>
-              ))}
-            </div>
-            
-            {/* Spin Button */}
-            <Button
-              variant="casino"
-              size="lg"
-              onClick={spin}
-              disabled={isSpinning}
-              className="w-full max-w-xs"
-            >
-              {isSpinning ? (
-                <>
-                  <Zap className="h-5 w-5 mr-2 animate-pulse" />
-                  Spinning...
-                </>
-              ) : (
-                <>
-                  <Zap className="h-5 w-5 mr-2" />
-                  SPIN (${betAmount})
-                </>
-              )}
-            </Button>
-            
-            {/* Result */}
-            {gameResult && !isSpinning && (
-              <div className="mt-6 p-4 bg-muted/10 rounded-lg">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Trophy className="h-5 w-5 text-accent" />
-                  <p className="text-lg font-semibold text-foreground">{gameResult}</p>
-                </div>
-                {winAmount > 0 && (
-                  <p className="text-2xl font-bold text-secondary">+${winAmount}</p>
-                )}
-              </div>
-            )}
-          </div>
+        <div className="flex justify-center mb-6">
+          <SlotMachine
+            reels={reels}
+            isSpinning={isSpinning}
+            onSpin={spin}
+            betAmount={betAmount}
+            gameResult={gameResult}
+            winAmount={winAmount}
+          />
         </div>
 
         {/* Payout Table */}

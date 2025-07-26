@@ -58,12 +58,12 @@ export const useGamblingStore = create<GamblingStore>()(
   persist(
     (set, get) => ({
       // Initial state
-      balance: 1250,
+      balance: 62500,
       transactions: [
         {
           id: '1',
           type: 'win',
-          amount: 250,
+          amount: 12500,
           game: 'poker',
           timestamp: new Date(Date.now() - 1000 * 60 * 30),
           status: 'completed',
@@ -71,7 +71,7 @@ export const useGamblingStore = create<GamblingStore>()(
         {
           id: '2',
           type: 'bet',
-          amount: -100,
+          amount: -5000,
           game: 'slots',
           timestamp: new Date(Date.now() - 1000 * 60 * 60),
           status: 'completed',
@@ -79,7 +79,7 @@ export const useGamblingStore = create<GamblingStore>()(
         {
           id: '3',
           type: 'topup',
-          amount: 500,
+          amount: 25000,
           timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
           status: 'completed',
         },
@@ -91,14 +91,14 @@ export const useGamblingStore = create<GamblingStore>()(
         totalLosses: 27,
         timePlayedToday: 45,
         betsToday: 12,
-        biggestWin: 850,
+        biggestWin: 42500,
         favoriteGame: 'poker',
       },
       
       settings: {
         safeMode: false,
         timeLimit: 60,
-        betLimit: 100,
+        betLimit: 5000,
         emailNotifications: true,
         soundEffects: true,
       },

@@ -7,10 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Minus, RotateCcw, Trophy } from "lucide-react";
 import { games } from "@/data/gameData";
 import { cn } from "@/lib/utils";
+import { RouletteWheel } from "@/components/RouletteWheel";
 
 const RouletteGame = () => {
   const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
-  const [betAmount, setBetAmount] = useState(50);
+  const [betAmount, setBetAmount] = useState(2500);
   const [selectedBets, setSelectedBets] = useState<Record<string, number>>({});
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningNumber, setWinningNumber] = useState<number | null>(null);
@@ -145,9 +146,9 @@ const RouletteGame = () => {
       if (won) {
         const winAmount = betAmount * multiplier;
         totalWinnings += winAmount;
-        results.push(`${betType}: +$${winAmount}`);
+        results.push(`${betType}: +KES ${winAmount.toLocaleString()}`);
       } else {
-        results.push(`${betType}: -$${betAmount}`);
+        results.push(`${betType}: -KES ${betAmount.toLocaleString()}`);
       }
     });
 
@@ -173,7 +174,7 @@ const RouletteGame = () => {
 
     toast({
       title: totalWinnings > 0 ? "🎉 You Won!" : "😔 No Win",
-      description: `Number ${number}! ${totalWinnings > 0 ? `You won $${totalWinnings}!` : 'Better luck next spin!'}`,
+      description: `Number ${number}! ${totalWinnings > 0 ? `You won KES ${totalWinnings.toLocaleString()}!` : 'Better luck next spin!'}`,
       variant: totalWinnings > 0 ? "default" : "destructive"
     });
 
@@ -209,11 +210,11 @@ const RouletteGame = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Your Balance</p>
-            <p className="text-2xl font-bold text-primary">${balance}</p>
+            <p className="text-2xl font-bold text-primary">KES {balance.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Total Bets</p>
-            <p className="text-2xl font-bold text-accent">${Object.values(selectedBets).reduce((sum, bet) => sum + bet, 0)}</p>
+            <p className="text-2xl font-bold text-accent">KES {Object.values(selectedBets).reduce((sum, bet) => sum + bet, 0).toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Last Number</p>
@@ -221,11 +222,11 @@ const RouletteGame = () => {
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Last Win</p>
-            <p className="text-2xl font-bold text-secondary">${totalWin}</p>
+            <p className="text-2xl font-bold text-secondary">KES {totalWin.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Bet Amount</p>
-            <p className="text-2xl font-bold text-foreground">${betAmount}</p>
+            <p className="text-2xl font-bold text-foreground">KES {betAmount.toLocaleString()}</p>
           </div>
         </div>
 
@@ -237,7 +238,7 @@ const RouletteGame = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setBetAmount(Math.max(5, betAmount - 25))}
+              onClick={() => setBetAmount(Math.max(250, betAmount - 1250))}
               disabled={isSpinning}
             >
               <Minus className="h-4 w-4" />
@@ -246,7 +247,7 @@ const RouletteGame = () => {
             <Input
               type="number"
               value={betAmount}
-              onChange={(e) => setBetAmount(Math.max(5, parseInt(e.target.value) || 5))}
+              onChange={(e) => setBetAmount(Math.max(250, parseInt(e.target.value) || 250))}
               className="w-24 text-center"
               disabled={isSpinning}
             />
@@ -254,7 +255,7 @@ const RouletteGame = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setBetAmount(betAmount + 25)}
+              onClick={() => setBetAmount(betAmount + 1250)}
               disabled={isSpinning}
             >
               <Plus className="h-4 w-4" />
@@ -262,7 +263,7 @@ const RouletteGame = () => {
           </div>
           
           <div className="flex gap-2">
-            {[5, 25, 50, 100].map((amount) => (
+            {[1250, 2500, 5000, 10000].map((amount) => (
               <Button
                 key={amount}
                 variant="outline"
@@ -270,7 +271,7 @@ const RouletteGame = () => {
                 onClick={() => setBetAmount(amount)}
                 disabled={isSpinning}
               >
-                ${amount}
+                KES {amount.toLocaleString()}
               </Button>
             ))}
           </div>
@@ -280,26 +281,11 @@ const RouletteGame = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Wheel */}
           <div className="bg-gradient-card border border-border/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4 text-center">Roulette Wheel</h3>
-            <div className="flex justify-center">
-              <div className={cn(
-                "w-48 h-48 rounded-full border-8 border-primary/50 flex items-center justify-center text-6xl font-bold relative",
-                isSpinning && "animate-spin"
-              )}>
-                <div className="text-center">
-                  {winningNumber !== null ? (
-                    <span className={cn(
-                      winningNumber === 0 ? "text-secondary" :
-                      redNumbers.includes(winningNumber) ? "text-red-500" : "text-foreground"
-                    )}>
-                      {winningNumber}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">?</span>
-                  )}
-                </div>
-              </div>
-            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-4 text-center">European Roulette</h3>
+            <RouletteWheel 
+              isSpinning={isSpinning}
+              winningNumber={winningNumber}
+            />
           </div>
 
           {/* Number Grid */}
@@ -322,7 +308,7 @@ const RouletteGame = () => {
                 >
                   {num}
                   {selectedBets[`number-${num}`] && (
-                    <div className="text-xs">${selectedBets[`number-${num}`]}</div>
+                    <div className="text-xs">KES {selectedBets[`number-${num}`].toLocaleString()}</div>
                   )}
                 </Button>
               ))}
@@ -359,7 +345,7 @@ const RouletteGame = () => {
               >
                 <span className="font-bold">{bet.label}</span>
                 {selectedBets[bet.key] && (
-                  <span className="text-xs">${selectedBets[bet.key]}</span>
+                  <span className="text-xs">KES {selectedBets[bet.key].toLocaleString()}</span>
                 )}
               </Button>
             ))}
@@ -415,7 +401,7 @@ const RouletteGame = () => {
             <p className="text-lg text-muted-foreground mb-2">Number: {winningNumber}</p>
             <p className="text-sm text-muted-foreground mb-4">{gameResult}</p>
             {totalWin > 0 && (
-              <p className="text-2xl font-bold text-secondary">Total Win: +${totalWin}</p>
+              <p className="text-2xl font-bold text-secondary">Total Win: +KES {totalWin.toLocaleString()}</p>
             )}
           </div>
         )}

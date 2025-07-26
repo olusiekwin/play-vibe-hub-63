@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Minus, Shuffle, Trophy } from "lucide-react";
 import { games } from "@/data/gameData";
+import { PlayingCard } from "@/components/PlayingCard";
 
 const PokerGame = () => {
   const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
-  const [betAmount, setBetAmount] = useState(50);
+  const [betAmount, setBetAmount] = useState(2500);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerCards, setPlayerCards] = useState<string[]>([]);
   const [gameResult, setGameResult] = useState<string>("");
@@ -111,7 +112,7 @@ const PokerGame = () => {
       betsToday: 1,
     });
     
-    const result = winAmount > 0 ? `You won $${winAmount}!` : "No winning hand.";
+    const result = winAmount > 0 ? `You won KES ${winAmount.toLocaleString()}!` : "No winning hand.";
     setGameResult(result);
     setIsPlaying(false);
     
@@ -150,19 +151,19 @@ const PokerGame = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Your Balance</p>
-            <p className="text-2xl font-bold text-primary">${balance}</p>
+            <p className="text-2xl font-bold text-primary">KES {balance.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Min Bet</p>
-            <p className="text-2xl font-bold text-foreground">${game.minBet}</p>
+            <p className="text-2xl font-bold text-foreground">KES {game.minBet.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Max Bet</p>
-            <p className="text-2xl font-bold text-foreground">${game.maxBet}</p>
+            <p className="text-2xl font-bold text-foreground">KES {game.maxBet.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Current Bet</p>
-            <p className="text-2xl font-bold text-accent">${betAmount}</p>
+            <p className="text-2xl font-bold text-accent">KES {betAmount.toLocaleString()}</p>
           </div>
         </div>
 
@@ -175,7 +176,7 @@ const PokerGame = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 25))}
+                onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 1250))}
                 disabled={betAmount <= game.minBet}
               >
                 <Minus className="h-4 w-4" />
@@ -193,7 +194,7 @@ const PokerGame = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 25))}
+                onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 1250))}
                 disabled={betAmount >= game.maxBet}
               >
                 <Plus className="h-4 w-4" />
@@ -201,14 +202,14 @@ const PokerGame = () => {
             </div>
             
             <div className="flex gap-2 mb-4">
-              {[25, 50, 100, 200].map((amount) => (
+              {[1250, 2500, 5000, 10000].map((amount) => (
                 <Button
                   key={amount}
                   variant="outline"
                   size="sm"
                   onClick={() => setBetAmount(Math.min(game.maxBet, amount))}
                 >
-                  ${amount}
+                  KES {amount.toLocaleString()}
                 </Button>
               ))}
             </div>
@@ -230,17 +231,12 @@ const PokerGame = () => {
               </h3>
               <div className="flex gap-3 justify-center flex-wrap">
                 {playerCards.map((card, index) => (
-                  <div
+                  <PlayingCard
                     key={index}
-                    className="w-20 h-28 bg-card border border-border rounded-lg flex flex-col items-center justify-center text-lg font-bold shadow-lg"
-                  >
-                    <span className={`text-2xl ${card.slice(-1) === '♥' || card.slice(-1) === '♦' ? 'text-red-500' : 'text-foreground'}`}>
-                      {card.slice(0, -1)}
-                    </span>
-                    <span className={`text-xl ${card.slice(-1) === '♥' || card.slice(-1) === '♦' ? 'text-red-500' : 'text-foreground'}`}>
-                      {card.slice(-1)}
-                    </span>
-                  </div>
+                    rank={card.slice(0, -1)}
+                    suit={card.slice(-1)}
+                    className="hover:scale-110 transition-transform duration-200"
+                  />
                 ))}
               </div>
             </div>

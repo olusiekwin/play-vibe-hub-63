@@ -20,7 +20,7 @@ export const WalletBalance = ({ balance, className }: WalletBalanceProps) => {
           <div>
             <p className="text-muted-foreground text-sm">Wallet Balance</p>
             <p className="text-2xl font-bold text-foreground">
-              ${balance.toLocaleString()}
+              KES {balance.toLocaleString()}
             </p>
           </div>
         </div>

@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Minus, Shuffle, Trophy } from "lucide-react";
 import { games } from "@/data/gameData";
+import { PlayingCard } from "@/components/PlayingCard";
 
 const BlackjackGame = () => {
   const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
-  const [betAmount, setBetAmount] = useState(50);
+  const [betAmount, setBetAmount] = useState(2500);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerCards, setPlayerCards] = useState<number[]>([]);
   const [dealerCards, setDealerCards] = useState<number[]>([]);
@@ -166,19 +167,19 @@ const BlackjackGame = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Your Balance</p>
-            <p className="text-2xl font-bold text-primary">${balance}</p>
+            <p className="text-2xl font-bold text-primary">KES {balance.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Min Bet</p>
-            <p className="text-2xl font-bold text-foreground">${game.minBet}</p>
+            <p className="text-2xl font-bold text-foreground">KES {game.minBet.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Max Bet</p>
-            <p className="text-2xl font-bold text-foreground">${game.maxBet}</p>
+            <p className="text-2xl font-bold text-foreground">KES {game.maxBet.toLocaleString()}</p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Current Bet</p>
-            <p className="text-2xl font-bold text-accent">${betAmount}</p>
+            <p className="text-2xl font-bold text-accent">KES {betAmount.toLocaleString()}</p>
           </div>
         </div>
 
@@ -191,7 +192,7 @@ const BlackjackGame = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 25))}
+                onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 1250))}
                 disabled={betAmount <= game.minBet}
               >
                 <Minus className="h-4 w-4" />
@@ -209,7 +210,7 @@ const BlackjackGame = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 25))}
+                onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 1250))}
                 disabled={betAmount >= game.maxBet}
               >
                 <Plus className="h-4 w-4" />
@@ -217,14 +218,14 @@ const BlackjackGame = () => {
             </div>
             
             <div className="flex gap-2 mb-4">
-              {[25, 50, 100, 200].map((amount) => (
+              {[1250, 2500, 5000, 10000].map((amount) => (
                 <Button
                   key={amount}
                   variant="outline"
                   size="sm"
                   onClick={() => setBetAmount(Math.min(game.maxBet, amount))}
                 >
-                  ${amount}
+                  KES {amount.toLocaleString()}
                 </Button>
               ))}
             </div>
@@ -246,12 +247,13 @@ const BlackjackGame = () => {
               </h3>
               <div className="flex gap-2 flex-wrap">
                 {dealerCards.map((card, index) => (
-                  <div
+                  <PlayingCard
                     key={index}
-                    className="w-16 h-24 bg-card border border-border rounded-lg flex items-center justify-center text-lg font-bold"
-                  >
-                    {(isPlaying && !gameResult && index === 1) ? "?" : card}
-                  </div>
+                    rank={(isPlaying && !gameResult && index === 1) ? "?" : card.toString()}
+                    suit={card === 1 ? "A" : card > 10 ? ["J", "Q", "K"][card - 11] : ""}
+                    isHidden={isPlaying && !gameResult && index === 1}
+                    className="transition-all duration-300"
+                  />
                 ))}
               </div>
             </div>
@@ -263,12 +265,12 @@ const BlackjackGame = () => {
               </h3>
               <div className="flex gap-2 flex-wrap">
                 {playerCards.map((card, index) => (
-                  <div
+                  <PlayingCard
                     key={index}
-                    className="w-16 h-24 bg-primary/20 border border-primary/50 rounded-lg flex items-center justify-center text-lg font-bold text-primary"
-                  >
-                    {card}
-                  </div>
+                    rank={card === 1 ? "A" : card > 10 ? ["J", "Q", "K"][card - 11] : card.toString()}
+                    suit="♠"
+                    className="border-primary/50 shadow-lg hover:scale-105 transition-transform duration-200"
+                  />
                 ))}
               </div>
             </div>
