@@ -26,16 +26,17 @@ export const PlayingCard = ({ rank, suit, className, isHidden = false }: Playing
 
   return (
     <div className={cn(
-      "w-20 h-28 bg-white border-2 border-gray-300 rounded-lg flex flex-col shadow-lg",
-      "relative overflow-hidden transition-all duration-200 hover:scale-105",
+      "w-20 h-28 bg-white border-2 border-gray-300 rounded-lg flex flex-col shadow-xl",
+      "relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl",
+      "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/40 before:to-transparent before:pointer-events-none",
       className
     )}>
       {/* Top-left corner */}
-      <div className="absolute top-1 left-1 text-xs font-bold">
-        <div className={cn("leading-none", isRed ? "text-red-500" : "text-black")}>
+      <div className="absolute top-1.5 left-1.5 text-xs font-bold z-10">
+        <div className={cn("leading-none text-sm", isRed ? "text-red-600" : "text-gray-800")}>
           {rank}
         </div>
-        <div className={cn("text-sm leading-none", isRed ? "text-red-500" : "text-black")}>
+        <div className={cn("text-base leading-none", isRed ? "text-red-600" : "text-gray-800")}>
           {suit}
         </div>
       </div>
