@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useWallet } from "@/hooks/useWallet";
 import { useGamblingStore } from "@/store/gamblingStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,11 @@ import { ArrowLeft, Plus, Minus, RotateCcw, Trophy } from "lucide-react";
 import { games } from "@/data/gameData";
 import { cn } from "@/lib/utils";
 import { RouletteWheel } from "@/components/RouletteWheel";
+import { AccountSwitcher } from "@/components/AccountSwitcher";
 
 const RouletteGame = () => {
-  const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
+  const { balance, accountMode, placeBet, processWin } = useWallet();
+  const { updateGameStats } = useGamblingStore();
   const [betAmount, setBetAmount] = useState(2500);
   const [selectedBets, setSelectedBets] = useState<Record<string, number>>({});
   const [isSpinning, setIsSpinning] = useState(false);
@@ -24,7 +27,7 @@ const RouletteGame = () => {
   const numbers = Array.from({ length: 37 }, (_, i) => i); // 0-36
   const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
-  const placeBet = (betType: string, amount: number) => {
+  const addBet = (betType: string, amount: number) => {
     const totalBets = Object.values(selectedBets).reduce((sum, bet) => sum + bet, 0);
     if (totalBets + amount > balance) {
       toast({
@@ -66,29 +69,31 @@ const RouletteGame = () => {
       return;
     }
 
-    // Deduct total bets from balance
-    updateBalance(-totalBets);
-    addTransaction({
-      type: 'bet',
-      amount: -totalBets,
-      game: 'roulette',
-      status: 'completed'
-    });
+    try {
+      // Place the bet on the backend
+      await placeBet(totalBets, 'roulette');
 
-    setIsSpinning(true);
-    setGameResult("");
-    setTotalWin(0);
+      setIsSpinning(true);
+      setGameResult("");
+      setTotalWin(0);
 
-    // Simulate spinning animation
-    setTimeout(() => {
-      const result = Math.floor(Math.random() * 37); // 0-36
-      setWinningNumber(result);
-      calculateWinnings(result);
-      setIsSpinning(false);
-    }, 3000);
+      // Simulate spinning animation
+      setTimeout(async () => {
+        const result = Math.floor(Math.random() * 37); // 0-36
+        setWinningNumber(result);
+        await calculateWinnings(result);
+        setIsSpinning(false);
+      }, 3000);
+    } catch (error) {
+      toast({
+        title: "Bet Failed",
+        description: "Failed to place bet. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const calculateWinnings = (number: number) => {
+  const calculateWinnings = async (number: number) => {
     let totalWinnings = 0;
     const results: string[] = [];
 
@@ -153,13 +158,11 @@ const RouletteGame = () => {
     });
 
     if (totalWinnings > 0) {
-      updateBalance(totalWinnings);
-      addTransaction({
-        type: 'win',
-        amount: totalWinnings,
-        game: 'roulette',
-        status: 'completed'
-      });
+      try {
+        await processWin(totalWinnings, 'roulette');
+      } catch (error) {
+        console.error('Failed to process win:', error);
+      }
     }
 
     setTotalWin(totalWinnings);
@@ -209,8 +212,11 @@ const RouletteGame = () => {
         {/* Game Info */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Your Balance</p>
+            <p className="text-sm text-muted-foreground">Your Balance ({accountMode.toUpperCase()})</p>
             <p className="text-2xl font-bold text-primary">KES {balance.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {accountMode === 'demo' ? 'Practice Money' : 'Real Money'}
+            </p>
           </div>
           <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
             <p className="text-sm text-muted-foreground">Total Bets</p>
@@ -278,7 +284,12 @@ const RouletteGame = () => {
         </div>
 
         {/* Roulette Wheel & Numbers */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Account Switcher */}
+          <div>
+            <AccountSwitcher />
+          </div>
+
           {/* Wheel */}
           <div className="bg-gradient-card border border-border/50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4 text-center">European Roulette</h3>
@@ -303,7 +314,7 @@ const RouletteGame = () => {
                     redNumbers.includes(num) ? "bg-red-500/20 text-red-500" : "bg-foreground/10",
                     selectedBets[`number-${num}`] && "ring-2 ring-primary"
                   )}
-                  onClick={() => placeBet(`number-${num}`, betAmount)}
+                  onClick={() => addBet(`number-${num}`, betAmount)}
                   disabled={isSpinning}
                 >
                   {num}
@@ -340,7 +351,7 @@ const RouletteGame = () => {
                   bet.color,
                   selectedBets[bet.key] && "ring-2 ring-primary"
                 )}
-                onClick={() => placeBet(bet.key, betAmount)}
+                onClick={() => addBet(bet.key, betAmount)}
                 disabled={isSpinning}
               >
                 <span className="font-bold">{bet.label}</span>

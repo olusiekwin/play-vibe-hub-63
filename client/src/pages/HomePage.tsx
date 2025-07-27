@@ -2,20 +2,51 @@ import { Link } from "react-router-dom";
 import { useGamblingStore } from "@/store/gamblingStore";
 import { WalletBalance } from "@/components/WalletBalance";
 import { GameCard } from "@/components/GameCard";
+import { TransactionList } from "@/components/TransactionList";
 import { games } from "@/data/gameData";
 import { Button } from "@/components/ui/button";
 import { Gamepad2, Mic, Shield, Plus, TrendingUp, Clock, Trophy } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useWallet } from "@/hooks/useWallet";
+import LoginForm from "@/components/LoginForm";
 
 const HomePage = () => {
-  const { balance, gameStats, currentStreak } = useGamblingStore();
+  const { gameStats, currentStreak } = useGamblingStore();
+  const { user, logout } = useAuth();
+  const { balance, currency, isLoading, error, transactions, transactionsLoading, fetchRecentTransactions } = useWallet();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Welcome to Casino Hub 🎲
+            </h1>
+            <p className="text-muted-foreground">
+              Please log in to access your gaming experience
+            </p>
+          </div>
+          <LoginForm />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-background pb-20">
       <div className="max-w-4xl mx-auto px-4 pt-6">
         {/* Welcome Header */}
-        <div className="text-center py-6">
+        <div className="text-center py-6 relative">
+          <Button
+            onClick={logout}
+            variant="outline"
+            className="absolute right-0 top-6"
+          >
+            Logout
+          </Button>
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome Back, High Roller! 🎲
+            Welcome Back, {user.username}! 🎲
           </h1>
           <p className="text-muted-foreground">
             Your luck is waiting. Ready to make it count?
@@ -50,7 +81,13 @@ const HomePage = () => {
         </div>
 
         {/* Wallet Balance */}
-        <WalletBalance balance={balance} className="mb-6" />
+        <WalletBalance 
+          balance={balance} 
+          currency={currency}
+          isLoading={isLoading}
+          error={error}
+          className="mb-6" 
+        />
 
         {/* Quick Actions */}
         <div className="space-y-3 mb-6">
@@ -107,12 +144,20 @@ const HomePage = () => {
 
         {/* Recent Activity */}
         <div className="mt-8 space-y-4">
-          <h2 className="text-xl font-semibold text-foreground">Recent Activity</h2>
-          <div className="bg-gradient-card border border-border/50 rounded-lg p-4">
-            <p className="text-muted-foreground text-center py-4">
-              Start playing to see your recent activity here!
-            </p>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-foreground">Recent Activity</h2>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => fetchRecentTransactions()}
+            >
+              Refresh
+            </Button>
           </div>
+          <TransactionList 
+            transactions={transactions.slice(0, 5)} 
+            isLoading={transactionsLoading}
+          />
         </div>
       </div>
     </div>

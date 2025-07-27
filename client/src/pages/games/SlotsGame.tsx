@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useWallet } from "@/hooks/useWallet";
 import { useGamblingStore } from "@/store/gamblingStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,8 @@ import { games } from "@/data/gameData";
 import { SlotMachine } from "@/components/SlotMachine";
 
 const SlotsGame = () => {
-  const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
+  const { balance, placeBet, processWin } = useWallet();
+  const { updateGameStats } = useGamblingStore();
   const [betAmount, setBetAmount] = useState(1250);
   const [isSpinning, setIsSpinning] = useState(false);
   const [reels, setReels] = useState(['🍒', '🍒', '🍒']);
@@ -43,47 +45,49 @@ const SlotsGame = () => {
       return;
     }
 
-    updateBalance(-betAmount);
-    addTransaction({
-      type: 'bet',
-      amount: -betAmount,
-      game: 'slots',
-      status: 'completed'
-    });
+    try {
+      await placeBet(betAmount, 'slots');
 
-    setIsSpinning(true);
-    setGameResult("");
-    setWinAmount(0);
+      setIsSpinning(true);
+      setGameResult("");
+      setWinAmount(0);
 
-    // Animate spinning
-    const spinDuration = 2000;
-    const spinInterval = 100;
-    const spins = spinDuration / spinInterval;
-    
-    for (let i = 0; i < spins; i++) {
-      setTimeout(() => {
-        setReels([
+      // Animate spinning
+      const spinDuration = 2000;
+      const spinInterval = 100;
+      const spins = spinDuration / spinInterval;
+      
+      for (let i = 0; i < spins; i++) {
+        setTimeout(() => {
+          setReels([
+            symbols[Math.floor(Math.random() * symbols.length)],
+            symbols[Math.floor(Math.random() * symbols.length)],
+            symbols[Math.floor(Math.random() * symbols.length)]
+          ]);
+        }, i * spinInterval);
+      }
+
+      // Final result
+      setTimeout(async () => {
+        const finalReels = [
           symbols[Math.floor(Math.random() * symbols.length)],
           symbols[Math.floor(Math.random() * symbols.length)],
           symbols[Math.floor(Math.random() * symbols.length)]
-        ]);
-      }, i * spinInterval);
+        ];
+        setReels(finalReels);
+        await calculateWin(finalReels);
+        setIsSpinning(false);
+      }, spinDuration);
+    } catch (error) {
+      toast({
+        title: "Bet Failed",
+        description: "Failed to place bet. Please try again.",
+        variant: "destructive"
+      });
     }
-
-    // Final result
-    setTimeout(() => {
-      const finalReels = [
-        symbols[Math.floor(Math.random() * symbols.length)],
-        symbols[Math.floor(Math.random() * symbols.length)],
-        symbols[Math.floor(Math.random() * symbols.length)]
-      ];
-      setReels(finalReels);
-      calculateWin(finalReels);
-      setIsSpinning(false);
-    }, spinDuration);
   };
 
-  const calculateWin = (finalReels: string[]) => {
+  const calculateWin = async (finalReels: string[]) => {
     const reelString = finalReels.join('');
     let multiplier = 0;
     let resultText = "";
@@ -122,13 +126,11 @@ const SlotsGame = () => {
     if (multiplier > 0) {
       const totalWin = betAmount * multiplier;
       setWinAmount(totalWin);
-      updateBalance(totalWin);
-      addTransaction({
-        type: 'win',
-        amount: totalWin,
-        game: 'slots',
-        status: 'completed'
-      });
+      try {
+        await processWin(totalWin, 'slots');
+      } catch (error) {
+        console.error('Failed to process win:', error);
+      }
       setGameResult(resultText);
       
       toast({

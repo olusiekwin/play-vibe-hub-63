@@ -1,10 +1,12 @@
 import { useGamblingStore } from "@/store/gamblingStore";
+import { useWallet } from "@/hooks/useWallet";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { User, Settings, LogOut, Mail, Bell, Volume2 } from "lucide-react";
 
 const ProfilePage = () => {
-  const { balance, gameStats, settings, updateSettings } = useGamblingStore();
+  const { gameStats, settings, updateSettings } = useGamblingStore();
+  const { balance, currency } = useWallet();
 
   return (
     <div className="min-h-screen bg-gradient-background pb-20">

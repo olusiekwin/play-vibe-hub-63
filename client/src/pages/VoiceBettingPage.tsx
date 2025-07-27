@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useGamblingStore } from "@/store/gamblingStore";
+import { useWallet } from "@/hooks/useWallet";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Mic, MicOff, Volume2, Zap, Brain } from "lucide-react";
@@ -21,7 +22,8 @@ interface VoiceCommand {
 }
 
 const VoiceBettingPage = () => {
-  const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
+  const { updateBalance, addTransaction, updateGameStats } = useGamblingStore();
+  const { balance, placeBet, processWin } = useWallet();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [parsedCommand, setParsedCommand] = useState<VoiceCommand | null>(null);

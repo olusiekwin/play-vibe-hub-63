@@ -3,14 +3,16 @@ import { WalletBalance } from "@/components/WalletBalance";
 import { GameCard } from "@/components/GameCard";
 import { games } from "@/data/gameData";
 import { Gamepad2, Mic, Shield, Plus } from "lucide-react";
+import { useWallet } from "@/hooks/useWallet";
 
 interface HomeSectionProps {
-  balance: number;
   onNavigate: (section: string) => void;
   onGamePlay: (gameId: string) => void;
 }
 
-export const HomeSection = ({ balance, onNavigate, onGamePlay }: HomeSectionProps) => {
+export const HomeSection = ({ onNavigate, onGamePlay }: HomeSectionProps) => {
+  const { balance, currency, isLoading, error } = useWallet();
+  
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
@@ -24,7 +26,12 @@ export const HomeSection = ({ balance, onNavigate, onGamePlay }: HomeSectionProp
       </div>
 
       {/* Wallet Balance */}
-      <WalletBalance balance={balance} />
+      <WalletBalance 
+        balance={balance} 
+        currency={currency}
+        isLoading={isLoading}
+        error={error}
+      />
 
       {/* Quick Actions */}
       <div className="space-y-3">

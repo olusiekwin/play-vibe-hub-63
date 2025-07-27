@@ -1,12 +1,21 @@
-import { DollarSign, TrendingUp } from "lucide-react";
+import { DollarSign, TrendingUp, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface WalletBalanceProps {
   balance: number;
+  currency?: string;
+  isLoading?: boolean;
+  error?: string | null;
   className?: string;
 }
 
-export const WalletBalance = ({ balance, className }: WalletBalanceProps) => {
+export const WalletBalance = ({ 
+  balance, 
+  currency = "KES", 
+  isLoading = false, 
+  error = null, 
+  className 
+}: WalletBalanceProps) => {
   return (
     <div className={cn(
       "bg-gradient-card border border-border/50 rounded-lg p-4 shadow-card",
@@ -15,13 +24,21 @@ export const WalletBalance = ({ balance, className }: WalletBalanceProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-primary/20 rounded-lg">
-            <DollarSign className="h-5 w-5 text-primary" />
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 text-primary animate-spin" />
+            ) : (
+              <DollarSign className="h-5 w-5 text-primary" />
+            )}
           </div>
           <div>
             <p className="text-muted-foreground text-sm">Wallet Balance</p>
-            <p className="text-2xl font-bold text-foreground">
-              KES {balance.toLocaleString()}
-            </p>
+            {error ? (
+              <p className="text-destructive text-sm">Failed to load balance</p>
+            ) : (
+              <p className="text-2xl font-bold text-foreground">
+                {currency} {isLoading ? "..." : balance.toLocaleString()}
+              </p>
+            )}
           </div>
         </div>
         <div className="text-right">

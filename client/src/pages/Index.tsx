@@ -6,11 +6,12 @@ import { VoiceSection } from "@/components/sections/VoiceSection";
 import { WalletSection } from "@/components/sections/WalletSection";
 import { HealthSection } from "@/components/sections/HealthSection";
 import { useToast } from "@/hooks/use-toast";
+import { useWallet } from "@/hooks/useWallet";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
-  const [balance, setBalance] = useState(1250);
   const { toast } = useToast();
+  const { balance, placeBet } = useWallet();
 
   const handleGamePlay = (gameId: string) => {
     toast({
@@ -19,21 +20,22 @@ const Index = () => {
     });
   };
 
-  const handleTopUp = (amount: number) => {
-    setBalance(prev => prev + amount);
-    toast({
-      title: "Top Up Successful!",
-      description: `$${amount} has been added to your wallet via M-Pesa.`,
-    });
-  };
-
-  const handlePlaceBet = (amount: number, game: string, bet: string) => {
+  const handlePlaceBet = async (amount: number, game: string, bet: string) => {
     if (amount <= balance) {
-      setBalance(prev => prev - amount);
-      toast({
-        title: "Bet Placed!",
-        description: `$${amount} bet on ${bet} in ${game}. Good luck!`,
-      });
+      try {
+        // This would need to be implemented properly with game integration
+        // For now, just show a placeholder message
+        toast({
+          title: "Bet Placed!",
+          description: `KES ${amount.toLocaleString()} bet on ${bet} in ${game}. Good luck!`,
+        });
+      } catch (error) {
+        toast({
+          title: "Bet Failed",
+          description: "Please try again.",
+          variant: "destructive"
+        });
+      }
     } else {
       toast({
         title: "Insufficient Funds",
@@ -48,7 +50,6 @@ const Index = () => {
       case "home":
         return (
           <HomeSection
-            balance={balance}
             onNavigate={setActiveTab}
             onGamePlay={handleGamePlay}
           />
@@ -70,9 +71,7 @@ const Index = () => {
       case "wallet":
         return (
           <WalletSection
-            balance={balance}
             onBack={() => setActiveTab("home")}
-            onTopUp={handleTopUp}
           />
         );
       case "health":
@@ -84,7 +83,6 @@ const Index = () => {
       default:
         return (
           <HomeSection
-            balance={balance}
             onNavigate={setActiveTab}
             onGamePlay={handleGamePlay}
           />

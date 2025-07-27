@@ -21,6 +21,13 @@ const transactionSchema = new Schema({
     enum: ['KES'],
     default: 'KES'
   },
+  // Account type for the transaction
+  accountType: {
+    type: String,
+    enum: ['demo', 'real'],
+    required: [true, 'Account type is required'],
+    default: 'demo'
+  },
   game: {
     type: String,
     enum: ['blackjack', 'poker', 'roulette', 'slots']

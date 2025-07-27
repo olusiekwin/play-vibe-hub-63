@@ -18,6 +18,7 @@ import { requestLogger } from './middleware/requestLogger.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
+import simpleAuthRoutes from './routes/simpleAuth.js';
 import userRoutes from './routes/user.js';
 import gameRoutes from './routes/game.js';
 import walletRoutes from './routes/wallet.js';
@@ -40,7 +41,7 @@ const app = express();
 const server = createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -53,8 +54,8 @@ connectDB();
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173', 'http://localhost:3000'],
-  credentials: true
+  origin: "*",
+  credentials: false
 }));
 
 // Body parsing middleware
@@ -82,6 +83,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/simple-auth', simpleAuthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/games', gameRoutes);
@@ -122,3 +124,4 @@ process.on('SIGINT', () => {
 });
 
 export default app;
+

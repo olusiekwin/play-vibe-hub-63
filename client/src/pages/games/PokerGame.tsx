@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useWallet } from "@/hooks/useWallet";
 import { useGamblingStore } from "@/store/gamblingStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,8 @@ import { games } from "@/data/gameData";
 import { PlayingCard } from "@/components/PlayingCard";
 
 const PokerGame = () => {
-  const { balance, updateBalance, addTransaction, updateGameStats } = useGamblingStore();
+  const { balance, placeBet, processWin } = useWallet();
+  const { updateGameStats } = useGamblingStore();
   const [betAmount, setBetAmount] = useState(2500);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playerCards, setPlayerCards] = useState<string[]>([]);
@@ -64,7 +66,7 @@ const PokerGame = () => {
     return { rank: "High Card", multiplier: 0 };
   };
 
-  const startGame = () => {
+  const startGame = async () => {
     if (betAmount > balance) {
       toast({
         title: "Insufficient Funds",
@@ -74,35 +76,35 @@ const PokerGame = () => {
       return;
     }
 
-    updateBalance(-betAmount);
-    addTransaction({
-      type: 'bet',
-      amount: -betAmount,
-      game: 'poker',
-      status: 'completed'
-    });
+    try {
+      await placeBet(betAmount, 'poker');
 
-    const newCards = Array(5).fill(null).map(() => generateCard());
-    setPlayerCards(newCards);
-    setIsPlaying(true);
-    setGameResult("");
-    setHandRank("");
+      const newCards = Array(5).fill(null).map(() => generateCard());
+      setPlayerCards(newCards);
+      setIsPlaying(true);
+      setGameResult("");
+      setHandRank("");
+    } catch (error) {
+      toast({
+        title: "Bet Failed",
+        description: "Failed to place bet. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const finishGame = () => {
+  const finishGame = async () => {
     const analysis = analyzeHand(playerCards);
     setHandRank(analysis.rank);
     
     let winAmount = 0;
     if (analysis.multiplier > 0) {
       winAmount = betAmount * analysis.multiplier;
-      updateBalance(winAmount);
-      addTransaction({
-        type: 'win',
-        amount: winAmount,
-        game: 'poker',
-        status: 'completed'
-      });
+      try {
+        await processWin(winAmount, 'poker');
+      } catch (error) {
+        console.error('Failed to process win:', error);
+      }
     }
     
     updateGameStats({

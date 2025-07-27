@@ -1,39 +1,38 @@
-import { useState } from "react";
-import { useGamblingStore } from "@/store/gamblingStore";
+import { useState, useEffect } from "react";
+import { useWallet } from "@/hooks/useWallet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WalletBalance } from "@/components/WalletBalance";
-import { Smartphone, Plus, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { TransactionList } from "@/components/TransactionList";
+import { Smartphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const WalletPage = () => {
-  const { balance, transactions, updateBalance, addTransaction } = useGamblingStore();
+  const { 
+    balance, 
+    currency, 
+    deposit, 
+    withdraw, 
+    isLoading: walletLoading, 
+    transactions, 
+    fetchTransactions 
+  } = useWallet();
   const [topUpAmount, setTopUpAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const handleTopUp = async () => {
     const amount = parseFloat(topUpAmount);
     if (amount > 0 && phoneNumber) {
       setIsLoading(true);
       
-      // Add pending transaction
-      addTransaction({
-        type: 'topup',
-        amount: amount,
-        status: 'pending',
-      });
-      
-      // Simulate M-Pesa STK push and processing
-      setTimeout(() => {
-        updateBalance(amount);
-        addTransaction({
-          type: 'topup',
-          amount: amount,
-          status: 'completed',
-        });
+      try {
+        await deposit(amount, 'mpesa', phoneNumber);
         
         toast({
           title: "💰 Top Up Successful!",
@@ -42,43 +41,15 @@ const WalletPage = () => {
         
         setTopUpAmount("");
         setPhoneNumber("");
+      } catch (error) {
+        toast({
+          title: "❌ Top Up Failed",
+          description: "There was an error processing your top-up. Please try again.",
+        });
+      } finally {
         setIsLoading(false);
-      }, 3000);
-      
-      toast({
-        title: "📱 M-Pesa STK Sent",
-        description: "Check your phone and enter your M-Pesa PIN to complete the transaction.",
-      });
+      }
     }
-  };
-
-  const getTransactionIcon = (transaction: any) => {
-    switch (transaction.type) {
-      case 'win':
-        return <TrendingUp className="h-5 w-5 text-secondary" />;
-      case 'bet':
-        return <TrendingDown className="h-5 w-5 text-destructive" />;
-      case 'topup':
-        return <Plus className="h-5 w-5 text-primary" />;
-      default:
-        return <Clock className="h-5 w-5 text-muted-foreground" />;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-secondary" />;
-      case 'failed':
-        return <XCircle className="h-4 w-4 text-destructive" />;
-      default:
-        return <Clock className="h-4 w-4 text-primary animate-spin" />;
-    }
-  };
-
-  const formatTransactionAmount = (transaction: any) => {
-    const prefix = transaction.type === 'bet' ? '-' : '+';
-    return `${prefix}$${Math.abs(transaction.amount)}`;
   };
 
   return (
@@ -93,7 +64,12 @@ const WalletPage = () => {
         </div>
 
         {/* Wallet Balance */}
-        <WalletBalance balance={balance} className="mb-6" />
+        <WalletBalance 
+          balance={balance} 
+          currency={currency}
+          isLoading={walletLoading}
+          className="mb-6" 
+        />
 
         {/* Top Up Section */}
         <div className="bg-gradient-card border border-border/50 rounded-lg p-6 mb-6">
@@ -176,58 +152,7 @@ const WalletPage = () => {
             </Button>
           </div>
           
-          <div className="space-y-3">
-            {transactions.length > 0 ? (
-              transactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="bg-gradient-card border border-border/50 rounded-lg p-4 flex items-center justify-between hover:bg-card/80 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-muted/20 rounded-lg">
-                      {getTransactionIcon(transaction)}
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {transaction.type === 'topup' ? 'M-Pesa Top Up' : 
-                         transaction.type === 'win' ? `Win - ${transaction.game}` :
-                         `Bet - ${transaction.game}`}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(transaction.timestamp).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right flex items-center gap-3">
-                    <div>
-                      <p className={cn(
-                        "font-bold text-lg",
-                        transaction.type === 'win' ? "text-secondary" :
-                        transaction.type === 'bet' ? "text-destructive" :
-                        "text-primary"
-                      )}>
-                        {formatTransactionAmount(transaction)}
-                      </p>
-                      <div className="flex items-center gap-1 justify-end">
-                        {getStatusIcon(transaction.status)}
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {transaction.status}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="bg-gradient-card border border-border/50 rounded-lg p-8 text-center">
-                <p className="text-muted-foreground">No transactions yet</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Start playing or top up your wallet to see transactions here
-                </p>
-              </div>
-            )}
-          </div>
+          <TransactionList transactions={transactions} />
         </div>
       </div>
     </div>

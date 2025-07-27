@@ -92,9 +92,28 @@ const userSchema = new Schema({
       'Turkana', 'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'
     ]
   },
+  // Demo account balance - for practice/testing
+  demoBalance: {
+    type: Number,
+    default: 10000, // Give new users 10,000 KES demo balance
+    min: [-100000, 'Demo balance cannot exceed minus 100k']
+  },
+  // Real account balance - actual money
+  realBalance: {
+    type: Number,
+    default: 0, // Real balance starts at 0, requires deposit
+    min: [0, 'Real balance cannot be negative']
+  },
+  // Current account mode
+  accountMode: {
+    type: String,
+    enum: ['demo', 'real'],
+    default: 'demo' // Users start in demo mode
+  },
+  // Legacy balance field - we'll use this for backward compatibility
   balance: {
     type: Number,
-    default: 0,
+    default: 10000, // Keep for backward compatibility
     min: [0, 'Balance cannot be negative']
   },
   role: {
@@ -105,19 +124,19 @@ const userSchema = new Schema({
   status: {
     type: String,
     enum: ['active', 'suspended', 'banned', 'pending_verification'],
-    default: 'pending_verification'
+    default: 'active'
   },
   isEmailVerified: {
     type: Boolean,
-    default: false
+    default: true
   },
   isPhoneVerified: {
     type: Boolean,
-    default: false
+    default: true
   },
   isIdVerified: {
     type: Boolean,
-    default: false
+    default: true
   },
   preferences: {
     type: userPreferencesSchema,

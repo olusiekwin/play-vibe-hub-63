@@ -1,50 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WalletBalance } from "@/components/WalletBalance";
-import { mockTransactions, Transaction } from "@/data/gameData";
-import { ArrowLeft, Plus, Smartphone, TrendingUp, TrendingDown, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { TransactionList } from "@/components/TransactionList";
+import { ArrowLeft, Smartphone } from "lucide-react";
+import { useWallet } from "@/hooks/useWallet";
 
 interface WalletSectionProps {
-  balance: number;
   onBack: () => void;
-  onTopUp: (amount: number) => void;
 }
 
-export const WalletSection = ({ balance, onBack, onTopUp }: WalletSectionProps) => {
+export const WalletSection = ({ onBack }: WalletSectionProps) => {
   const [topUpAmount, setTopUpAmount] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isDepositLoading, setIsDepositLoading] = useState(false);
+  const { balance, currency, isLoading, error, deposit, transactions, fetchTransactions } = useWallet();
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const handleTopUp = async () => {
     const amount = parseFloat(topUpAmount);
     if (amount > 0) {
-      setIsLoading(true);
-      // Simulate M-Pesa API call
-      setTimeout(() => {
-        onTopUp(amount);
+      setIsDepositLoading(true);
+      try {
+        await deposit(amount, 'mpesa', '254700000000'); // Default phone number
         setTopUpAmount("");
-        setIsLoading(false);
-      }, 2000);
+      } catch (err) {
+        console.error('Deposit failed:', err);
+      } finally {
+        setIsDepositLoading(false);
+      }
     }
-  };
-
-  const getTransactionIcon = (transaction: Transaction) => {
-    switch (transaction.type) {
-      case 'win':
-        return <TrendingUp className="h-4 w-4 text-secondary" />;
-      case 'bet':
-        return <TrendingDown className="h-4 w-4 text-destructive" />;
-      case 'topup':
-        return <Plus className="h-4 w-4 text-primary" />;
-      default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
-    }
-  };
-
-  const formatTransactionAmount = (transaction: Transaction) => {
-    const prefix = transaction.type === 'bet' ? '-' : '+';
-    return `${prefix}$${Math.abs(transaction.amount)}`;
   };
 
   return (
@@ -58,7 +45,12 @@ export const WalletSection = ({ balance, onBack, onTopUp }: WalletSectionProps) 
       </div>
 
       {/* Wallet Balance */}
-      <WalletBalance balance={balance} />
+      <WalletBalance 
+        balance={balance} 
+        currency={currency}
+        isLoading={isLoading}
+        error={error}
+      />
 
       {/* Top Up Section */}
       <div className="bg-gradient-card border border-border/50 rounded-lg p-4 space-y-4">
@@ -92,9 +84,9 @@ export const WalletSection = ({ balance, onBack, onTopUp }: WalletSectionProps) 
             variant="wallet" 
             className="w-full"
             onClick={handleTopUp}
-            disabled={!topUpAmount || isLoading}
+            disabled={!topUpAmount || isDepositLoading}
           >
-            {isLoading ? "Processing..." : "Top Up Now"}
+            {isDepositLoading ? "Processing..." : "Top Up Now"}
           </Button>
         </div>
       </div>
@@ -102,43 +94,7 @@ export const WalletSection = ({ balance, onBack, onTopUp }: WalletSectionProps) 
       {/* Transaction History */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">Recent Transactions</h2>
-        
-        <div className="space-y-2">
-          {mockTransactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className="bg-gradient-card border border-border/50 rounded-lg p-3 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                {getTransactionIcon(transaction)}
-                <div>
-                  <p className="font-medium text-foreground">
-                    {transaction.type === 'topup' ? 'M-Pesa Top Up' : 
-                     transaction.type === 'win' ? `Win - ${transaction.game}` :
-                     `Bet - ${transaction.game}`}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {transaction.timestamp.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="text-right">
-                <p className={cn(
-                  "font-bold",
-                  transaction.type === 'win' ? "text-secondary" :
-                  transaction.type === 'bet' ? "text-destructive" :
-                  "text-primary"
-                )}>
-                  {formatTransactionAmount(transaction)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {transaction.status}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <TransactionList transactions={transactions} />
       </div>
     </div>
   );
