@@ -132,178 +132,236 @@ const PokerGame = () => {
 
   return (
     <div className="min-h-screen bg-gradient-background pb-20">
-      <div className="max-w-4xl mx-auto px-4 pt-6">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+      {/* Casino Atmosphere Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-casino-black via-felt-green/20 to-casino-black opacity-90 pointer-events-none" />
+      
+      <div className="relative max-w-4xl mx-auto px-4 pt-6">
+        {/* Premium Header */}
+        <div className="flex items-center gap-4 mb-6 bg-gradient-felt border border-casino-gold/30 rounded-xl p-4 shadow-deep">
           <Link to="/games">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="border-casino-gold/50 text-casino-gold hover:bg-casino-gold/10">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Games
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">{game.title}</h1>
-            <p className="text-muted-foreground">Get the best poker hand!</p>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold bg-gradient-money bg-clip-text text-transparent drop-shadow-lg">
+              💎 {game.title} 💎
+            </h1>
+            <p className="text-casino-gold/90 font-medium">Premium Five-Card Draw Poker</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-casino-gold/70">House Edge</p>
+            <p className="text-lg font-bold text-casino-emerald">2.5%</p>
           </div>
         </div>
 
-        {/* Game Info */}
+        {/* Premium Stats Dashboard */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Your Balance</p>
-            <p className="text-2xl font-bold text-primary">KES {balance.toLocaleString()}</p>
+          <div className="bg-gradient-casino border-2 border-casino-gold/50 rounded-xl p-4 text-center shadow-money">
+            <p className="text-sm text-casino-black/80 font-semibold">💰 YOUR BALANCE</p>
+            <p className="text-2xl font-bold text-casino-black drop-shadow-sm">KES {balance.toLocaleString()}</p>
+            <div className="w-full bg-casino-black/20 rounded-full h-1 mt-2">
+              <div className="bg-casino-emerald h-1 rounded-full w-3/4"></div>
+            </div>
           </div>
-          <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Min Bet</p>
-            <p className="text-2xl font-bold text-foreground">KES {game.minBet.toLocaleString()}</p>
+          <div className="bg-gradient-poker border-2 border-poker-blue/70 rounded-xl p-4 text-center shadow-deep">
+            <p className="text-sm text-casino-gold/90 font-semibold">⚡ MIN BET</p>
+            <p className="text-2xl font-bold text-casino-white">KES {game.minBet.toLocaleString()}</p>
           </div>
-          <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Max Bet</p>
-            <p className="text-2xl font-bold text-foreground">KES {game.maxBet.toLocaleString()}</p>
+          <div className="bg-gradient-poker border-2 border-poker-blue/70 rounded-xl p-4 text-center shadow-deep">
+            <p className="text-sm text-casino-gold/90 font-semibold">🎯 MAX BET</p>
+            <p className="text-2xl font-bold text-casino-white">KES {game.maxBet.toLocaleString()}</p>
           </div>
-          <div className="bg-gradient-card border border-border/50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Current Bet</p>
-            <p className="text-2xl font-bold text-accent">KES {betAmount.toLocaleString()}</p>
+          <div className="bg-gradient-money border-2 border-casino-emerald/70 rounded-xl p-4 text-center shadow-money animate-pulse-glow">
+            <p className="text-sm text-casino-black/80 font-semibold">🎲 CURRENT BET</p>
+            <p className="text-2xl font-bold text-casino-black">KES {betAmount.toLocaleString()}</p>
           </div>
         </div>
 
-        {/* Bet Controls */}
+        {/* Premium Betting Interface */}
         {!isPlaying && (
-          <div className="bg-gradient-card border border-border/50 rounded-lg p-6 mb-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Place Your Bet</h2>
+          <div className="bg-gradient-felt border-2 border-casino-gold/40 rounded-xl p-6 mb-6 shadow-deep">
+            <h2 className="text-xl font-bold text-casino-gold mb-6 text-center">
+              💎 PLACE YOUR BET 💎
+            </h2>
             
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <Button
                 variant="outline"
-                size="sm"
+                size="lg"
                 onClick={() => setBetAmount(Math.max(game.minBet, betAmount - 1250))}
                 disabled={betAmount <= game.minBet}
+                className="border-casino-gold/50 text-casino-gold hover:bg-casino-gold/20 h-12 w-12 rounded-full"
               >
-                <Minus className="h-4 w-4" />
+                <Minus className="h-5 w-5" />
               </Button>
               
-              <Input
-                type="number"
-                value={betAmount}
-                onChange={(e) => setBetAmount(Math.max(game.minBet, Math.min(game.maxBet, parseInt(e.target.value) || game.minBet)))}
-                className="w-24 text-center"
-                min={game.minBet}
-                max={game.maxBet}
-              />
+              <div className="bg-casino-black/50 border-2 border-casino-gold rounded-xl p-4 min-w-[200px] text-center">
+                <Input
+                  type="number"
+                  value={betAmount}
+                  onChange={(e) => setBetAmount(Math.max(game.minBet, Math.min(game.maxBet, parseInt(e.target.value) || game.minBet)))}
+                  className="text-center text-2xl font-bold bg-transparent border-none text-casino-gold focus:ring-casino-gold"
+                  min={game.minBet}
+                  max={game.maxBet}
+                />
+                <p className="text-casino-gold/70 text-sm font-medium">KES Amount</p>
+              </div>
               
               <Button
                 variant="outline"
-                size="sm"
+                size="lg"
                 onClick={() => setBetAmount(Math.min(game.maxBet, betAmount + 1250))}
                 disabled={betAmount >= game.maxBet}
+                className="border-casino-gold/50 text-casino-gold hover:bg-casino-gold/20 h-12 w-12 rounded-full"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-5 w-5" />
               </Button>
             </div>
             
-            <div className="flex gap-2 mb-4">
+            <div className="grid grid-cols-4 gap-3 mb-6">
               {[1250, 2500, 5000, 10000].map((amount) => (
                 <Button
                   key={amount}
                   variant="outline"
-                  size="sm"
                   onClick={() => setBetAmount(Math.min(game.maxBet, amount))}
+                  className="bg-casino-gold/10 border-casino-gold/40 text-casino-gold hover:bg-casino-gold/20 font-bold py-3"
                 >
                   KES {amount.toLocaleString()}
                 </Button>
               ))}
             </div>
             
-            <Button variant="casino" onClick={startGame} className="w-full">
-              <Shuffle className="h-4 w-4 mr-2" />
-              Deal Cards
+            <Button 
+              onClick={startGame} 
+              className="w-full h-14 text-xl font-bold bg-gradient-money border-2 border-casino-emerald shadow-money hover:shadow-deep transition-all duration-300 hover:scale-105"
+            >
+              <Shuffle className="h-6 w-6 mr-3" />
+              💰 DEAL CARDS & WIN BIG 💰
             </Button>
           </div>
         )}
 
-        {/* Game Board */}
+        {/* Premium Casino Table */}
         {isPlaying || gameResult && (
           <div className="space-y-6">
-            {/* Player Cards */}
-            <div className="bg-gradient-card border border-border/50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">
-                Your Hand {handRank && `- ${handRank}`}
+            {/* Professional Poker Table */}
+            <div className="bg-gradient-felt border-4 border-casino-gold/60 rounded-2xl p-8 shadow-deep relative overflow-hidden">
+              {/* Table Felt Pattern */}
+              <div className="absolute inset-0 bg-felt-green opacity-20 pointer-events-none" style={{
+                backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+                backgroundSize: '20px 20px'
+              }} />
+              
+              <h3 className="text-2xl font-bold text-casino-gold mb-6 text-center drop-shadow-lg">
+                🎭 {handRank ? `${handRank} Hand` : 'Your Poker Hand'} 🎭
               </h3>
-              <div className="flex gap-3 justify-center flex-wrap">
+              
+              <div className="relative flex gap-4 justify-center flex-wrap mb-6">
                 {playerCards.map((card, index) => (
-                  <PlayingCard
-                    key={index}
-                    rank={card.slice(0, -1)}
-                    suit={card.slice(-1)}
-                    className="hover:scale-110 transition-transform duration-200"
-                  />
+                  <div key={index} className="relative">
+                    <PlayingCard
+                      rank={card.slice(0, -1)}
+                      suit={card.slice(-1)}
+                      className="hover:scale-110 transition-all duration-300 shadow-deep"
+                    />
+                    {handRank && (
+                      <div className="absolute -top-3 -right-3 w-8 h-8 bg-casino-gold rounded-full flex items-center justify-center text-casino-black font-bold text-sm animate-bounce">
+                        {index + 1}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
+
+              {/* Decorative casino elements */}
+              <div className="absolute top-4 left-4 text-casino-gold/30 text-2xl">♠</div>
+              <div className="absolute top-4 right-4 text-casino-gold/30 text-2xl">♥</div>
+              <div className="absolute bottom-4 left-4 text-casino-gold/30 text-2xl">♦</div>
+              <div className="absolute bottom-4 right-4 text-casino-gold/30 text-2xl">♣</div>
             </div>
 
-            {/* Game Controls */}
+            {/* Game Action Center */}
             {isPlaying && !gameResult && (
-              <div className="text-center">
-                <Button variant="casino" onClick={finishGame} size="lg">
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Show Results
+              <div className="text-center bg-gradient-casino border-2 border-casino-gold rounded-xl p-6 shadow-money">
+                <Button 
+                  onClick={finishGame} 
+                  size="lg"
+                  className="bg-gradient-money border-2 border-casino-emerald text-casino-black font-bold text-xl px-8 py-4 shadow-money hover:shadow-deep transition-all duration-300 hover:scale-105"
+                >
+                  <Trophy className="h-6 w-6 mr-3" />
+                  💰 REVEAL WINNING HAND 💰
                 </Button>
               </div>
             )}
 
-            {/* Game Result */}
+            {/* Premium Results Display */}
             {gameResult && (
-              <div className="bg-gradient-card border border-border/50 rounded-lg p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Trophy className="h-6 w-6 text-accent" />
-                  <h2 className="text-xl font-bold text-foreground">Game Over</h2>
+              <div className="bg-gradient-casino border-4 border-casino-gold rounded-2xl p-8 text-center shadow-money relative overflow-hidden">
+                {/* Celebration background effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-casino-gold/20 via-casino-emerald/20 to-casino-gold/20 animate-pulse" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-center gap-3 mb-6">
+                    <Trophy className="h-12 w-12 text-casino-gold animate-bounce" />
+                    <h2 className="text-3xl font-bold text-casino-black drop-shadow-lg">GAME COMPLETE</h2>
+                    <Trophy className="h-12 w-12 text-casino-gold animate-bounce" />
+                  </div>
+                  
+                  <div className="bg-casino-black/20 rounded-xl p-4 mb-6">
+                    <p className="text-2xl font-bold text-casino-emerald mb-2">{handRank}</p>
+                    <p className="text-xl text-casino-black font-semibold">{gameResult}</p>
+                  </div>
+                  
+                  <Button 
+                    onClick={resetGame}
+                    className="bg-gradient-money border-2 border-casino-emerald text-casino-black font-bold text-xl px-8 py-4 shadow-money hover:shadow-deep transition-all duration-300 hover:scale-105"
+                  >
+                    🎲 PLAY ANOTHER HAND 🎲
+                  </Button>
                 </div>
-                <p className="text-lg text-accent mb-2">{handRank}</p>
-                <p className="text-lg text-muted-foreground mb-4">{gameResult}</p>
-                <Button variant="casino" onClick={resetGame}>
-                  Play Again
-                </Button>
               </div>
             )}
           </div>
         )}
 
-        {/* Payout Table */}
-        <div className="bg-gradient-card border border-border/50 rounded-lg p-6 mt-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Payout Table</h3>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Straight Flush</span>
-              <span className="text-foreground font-bold">50x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Four of a Kind</span>
-              <span className="text-foreground font-bold">25x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Full House</span>
-              <span className="text-foreground font-bold">9x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Flush</span>
-              <span className="text-foreground font-bold">6x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Straight</span>
-              <span className="text-foreground font-bold">4x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Three of a Kind</span>
-              <span className="text-foreground font-bold">3x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Two Pair</span>
-              <span className="text-foreground font-bold">2x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Pair</span>
-              <span className="text-foreground font-bold">1x</span>
-            </div>
+        {/* Premium Payout Schedule */}
+        <div className="bg-gradient-casino border-4 border-casino-gold/70 rounded-2xl p-8 mt-6 shadow-money">
+          <h3 className="text-2xl font-bold text-casino-black mb-6 text-center drop-shadow-lg">
+            💎 OFFICIAL PAYOUT SCHEDULE 💎
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { hand: "Straight Flush", multiplier: "50x", emoji: "🎆", color: "text-casino-ruby" },
+              { hand: "Four of a Kind", multiplier: "25x", emoji: "👑", color: "text-casino-emerald" },
+              { hand: "Full House", multiplier: "9x", emoji: "🏠", color: "text-casino-gold" },
+              { hand: "Flush", multiplier: "6x", emoji: "🌊", color: "text-poker-blue" },
+              { hand: "Straight", multiplier: "4x", emoji: "📈", color: "text-casino-emerald" },
+              { hand: "Three of a Kind", multiplier: "3x", emoji: "🎯", color: "text-casino-gold" },
+              { hand: "Two Pair", multiplier: "2x", emoji: "👥", color: "text-casino-emerald" },
+              { hand: "Pair", multiplier: "1x", emoji: "⭐", color: "text-casino-gold" }
+            ].map((payout, index) => (
+              <div key={index} className="bg-casino-black/20 border border-casino-gold/30 rounded-xl p-4 flex justify-between items-center hover:bg-casino-gold/10 transition-all duration-200">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{payout.emoji}</span>
+                  <span className="text-casino-black font-semibold">{payout.hand}</span>
+                </div>
+                <span className={`text-xl font-bold ${payout.color} drop-shadow-sm`}>
+                  {payout.multiplier}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-6 text-center bg-casino-black/20 rounded-xl p-4">
+            <p className="text-casino-black/80 text-sm font-medium">
+              💰 Minimum qualifying hand: One Pair or better
+            </p>
+            <p className="text-casino-emerald font-bold">
+              🎲 House Edge: 2.5% | RTP: 97.5%
+            </p>
           </div>
         </div>
       </div>

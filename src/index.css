@@ -42,15 +42,33 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Premium Casino Colors */
+    --casino-gold: 45 100% 60%;
+    --casino-emerald: 158 64% 52%;
+    --casino-ruby: 0 84% 60%;
+    --felt-green: 142 47% 20%;
+    --poker-blue: 225 100% 20%;
+    --roulette-red: 0 84% 45%;
+    --slot-gold: 45 100% 50%;
+    --casino-black: 0 0% 8%;
+    --casino-white: 0 0% 98%;
+
     /* Casino Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(45 93% 48%));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(142 76% 26%));
     --gradient-background: linear-gradient(180deg, hsl(var(--background)), hsl(220 13% 6%));
     --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(220 13% 14%));
+    --gradient-casino: linear-gradient(145deg, hsl(var(--casino-gold)/0.9), hsl(var(--casino-gold)/0.6));
+    --gradient-felt: linear-gradient(145deg, hsl(var(--felt-green)), hsl(var(--felt-green)/0.8));
+    --gradient-poker: linear-gradient(145deg, hsl(var(--poker-blue)), hsl(var(--poker-blue)/0.9));
+    --gradient-money: linear-gradient(135deg, hsl(var(--casino-gold)), hsl(var(--casino-emerald)));
     
     /* Casino Shadows & Effects */
     --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
     --shadow-card: 0 4px 20px hsl(220 13% 4% / 0.4);
+    --shadow-money: 0 12px 40px -10px hsl(var(--casino-gold) / 0.5);
+    --shadow-deep: 0 20px 60px -15px hsl(var(--casino-black) / 0.8);
+    --shadow-felt: inset 0 2px 8px hsl(var(--felt-green) / 0.6);
     --transition-casino: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;

@@ -52,6 +52,25 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				casino: {
+					gold: 'hsl(var(--casino-gold))',
+					emerald: 'hsl(var(--casino-emerald))',
+					ruby: 'hsl(var(--casino-ruby))',
+					black: 'hsl(var(--casino-black))',
+					white: 'hsl(var(--casino-white))',
+				},
+				felt: {
+					green: 'hsl(var(--felt-green))',
+				},
+				poker: {
+					blue: 'hsl(var(--poker-blue))',
+				},
+				roulette: {
+					red: 'hsl(var(--roulette-red))',
+				},
+				slot: {
+					gold: 'hsl(var(--slot-gold))',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -72,11 +91,18 @@ export default {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-secondary': 'var(--gradient-secondary)',
 				'gradient-background': 'var(--gradient-background)',
-				'gradient-card': 'var(--gradient-card)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-casino': 'var(--gradient-casino)',
+				'gradient-felt': 'var(--gradient-felt)',
+				'gradient-poker': 'var(--gradient-poker)',
+				'gradient-money': 'var(--gradient-money)'
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',
-				'card': 'var(--shadow-card)'
+				'card': 'var(--shadow-card)',
+				'money': 'var(--shadow-money)',
+				'deep': 'var(--shadow-deep)',
+				'felt': 'var(--shadow-felt)'
 			},
 			transitionTimingFunction: {
 				'casino': 'var(--transition-casino)'
