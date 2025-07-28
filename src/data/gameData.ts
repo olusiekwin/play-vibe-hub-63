@@ -2,6 +2,7 @@ import pokerImage from "@/assets/poker-game.jpg";
 import slotsImage from "@/assets/slots-game.jpg";
 import blackjackImage from "@/assets/blackjack-game.jpg";
 import rouletteImage from "@/assets/roulette-game.jpg";
+import aviatorImage from "@/assets/aviator-game.jpg";
 
 export interface Game {
   id: string;
@@ -44,6 +45,14 @@ export const games: Game[] = [
     category: 'Roulette',
     minBet: 1000,
     maxBet: 75000,
+  },
+  {
+    id: 'aviator',
+    title: 'Aviator Crash Game',
+    image: aviatorImage,
+    category: 'Crash',
+    minBet: 500,
+    maxBet: 100000,
   },
 ];
 

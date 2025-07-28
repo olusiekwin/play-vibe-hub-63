@@ -20,6 +20,7 @@ import BlackjackGame from "./pages/games/BlackjackGame";
 import PokerGame from "./pages/games/PokerGame";
 import SlotsGame from "./pages/games/SlotsGame";
 import RouletteGame from "./pages/games/RouletteGame";
+import AviatorGame from "./pages/games/AviatorGame";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/games/poker" element={<PokerGame />} />
           <Route path="/games/slots" element={<SlotsGame />} />
           <Route path="/games/roulette" element={<RouletteGame />} />
+          <Route path="/games/aviator" element={<AviatorGame />} />
           <Route path="/voice" element={<VoiceBettingPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/health" element={<MentalHealthPage />} />

@@ -14,7 +14,7 @@ export const GamesSection = ({ onBack, onGamePlay }: GamesSectionProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const categories = ["all", "Cards", "Slots", "Roulette"];
+  const categories = ["all", "Cards", "Slots", "Roulette", "Crash"];
 
   const filteredGames = games.filter((game) => {
     const matchesSearch = game.title.toLowerCase().includes(searchTerm.toLowerCase());
